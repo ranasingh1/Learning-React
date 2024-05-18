@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy, useState } from "react";
 import ReactDOM from "react-dom/client";
 import '../index.css'
 import Header from "./components/Header";
@@ -10,45 +10,35 @@ import Footer from "./components/Footer";
 import Contact from "./components/Contact";
 import RestaurantMenu from "./components/RestaurantMenu";
 import Profile from "./components/Profile";
-/* My Food App structure will look like this, 
-            1) Header
-                - Logo
-                - Nav Items(right side)
-                - Cart
-            2) Body
-                - Search bar
-                - Restaurants List
-                    - Restaurant card
-                        - Image
-                        - Name
-                        - Rating
-            3) Footer
-                - Links
-                - Copyrights
-       
-*/
+import UserContext from "../utils/UserContext";
+import Instamart from "./components/Instamart";
+import { Provider } from "react-redux";
+import store from "../utils/store";
+import Cart from "./components/Cart";
 
-// Title component for display logo
-
-// Header component for header section: Logo, Nav Items
-
-// RestaurantList is JSON Data for displaying cards
-
-// Restaurant card component: Image, name, cuisine
-
-// Body Component for body section: It contain all restaurant cards
-// We are mapping restaurantList array and passing data to RestaurantCard component as props with unique key as index
-
-// Footer component for footer section
+const About = lazy(()=>import("./components/About"))
 
 // AppLayout component to show: Header, Body, Footer
 const AppLayout = () => {
+const[user, setUser] = useState({
+  
+    name:"Dummy",
+    email:"email@gmail.com"
+  
+});
+
+
   return (
-    <>
+    <Provider store={store}>
+    <UserContext.Provider value={{
+      user:user,
+      setUser:setUser
+    }} >
       <Header />
       <Outlet/>
       <Footer />
-    </>
+      </UserContext.Provider>
+    </Provider>
   );
 };
 
@@ -64,7 +54,10 @@ const appRouter = createBrowserRouter([
       },
       {
         path:"/about",
-        element:<About />,
+        element:
+        <Suspense>
+        <About />
+        </Suspense>,
         children:[
           {
             path:"profile",
@@ -79,6 +72,14 @@ const appRouter = createBrowserRouter([
       {
         path:"/restaurant/:id",
         element:<RestaurantMenu />
+      },
+      {
+        path:"/instamart",
+        element:<Instamart />
+      },
+      {
+        path:"/cart",
+        element:<Cart/>
       }
     ]
   },
